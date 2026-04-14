@@ -150,11 +150,15 @@ class BaseContentScreen(BaseArchivCZSKListSourceScreen):
 
 
 	def resolveCommand(self, command, arg):
+		completely_handled = False
+
 		if command is not None:
 			if command == 'refreshnow':
 				self.refreshList()
+				completely_handled = True
 			elif command == 'refreshnow_resetpos':
 				self.refreshList(restoreLastPosition=False)
+				completely_handled = True
 			elif command == 'updatelist':
 				self.refreshing = True
 			elif command == 'refreshparent':
@@ -166,13 +170,16 @@ class BaseContentScreen(BaseArchivCZSKListSourceScreen):
 				self.stopLoading()
 				self.showList()
 				self.workingFinished()
+				completely_handled = True
 			elif command == 'reload':
 				self.stopLoading()
 				self.showList()
 				self.workingFinished()
+				completely_handled = True
 			else:
 				log.debug("unknown command %s" , command)
 
+		return completely_handled
 
 	def ok(self):
 

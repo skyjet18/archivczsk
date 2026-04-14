@@ -11,6 +11,7 @@ from ..trakttv import trakttv
 from ..serialize import is_serializable
 from ...py3compat import *
 from ...colors import DeleteColors
+from ..exceptions.addon import AddonException
 
 
 class FolderItemHandler(ItemHandler):
@@ -29,12 +30,8 @@ class FolderItemHandler(ItemHandler):
 		def open_item_success_cb(result):
 			list_items, screen_command, args = result
 
-			if not list_items and screen_command is not None:
-				# if there are no items to process, then just resolve screen command - this is needed for correct working of edit ctx menu commands of search menu
-				self.content_screen.resolveCommand(screen_command, args)
-			else:
+			if self.content_screen.resolveCommand(screen_command, args) == False or list_items:
 				list_items.insert(0, PExit())
-				self.content_screen.resolveCommand(screen_command, args)
 
 				if not self.content_screen.refreshing:
 					self.content_screen.save()
@@ -57,7 +54,8 @@ class FolderItemHandler(ItemHandler):
 
 		@AddonExceptionHandler(self.session, self.content_provider)
 		def open_item_error_cb(failure):
-			log.logError("Folder get_content error cb.\n%s"%failure)
+			if not isinstance(failure.value, AddonException):
+				log.logError("Folder get_content error cb.\n%s"%failure)
 			self.content_screen.stopLoading()
 			self.content_screen.showList()
 			self.content_screen.workingFinished()
