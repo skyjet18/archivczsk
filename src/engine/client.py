@@ -37,6 +37,9 @@ def abortTask(func):
 		return func(*args, **kwargs)
 	return wrapped_func
 
+def check_for_abort():
+	task = Task.get_active_task()
+	return task and task.isCancelling()
 
 def getVersion():
 	return "1.0"
