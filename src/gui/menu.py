@@ -65,7 +65,10 @@ class BaseArchivCZSKConfigScreen(BaseArchivCZSKScreen, ConfigListScreen):
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
-		self.refreshConfigList(only_callable=True)
+
+		current = self["config"].getCurrent()[1]
+		if not isinstance(current, ConfigText):
+			self.refreshConfigList(only_callable=True)
 
 	def nextCategory(self):
 		if len(self.categories) > 0:
