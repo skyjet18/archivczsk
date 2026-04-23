@@ -336,8 +336,13 @@ def __process_info_labels(item, info_labels):
 		# info_labels as callable, that will return real info_labels dictionary
 		item.load_info_cbk = lambda cbk_continue: load_info(info_labels, cbk_continue)
 	else:
-		# info_labels as dictionary - just call function to set it ...
-		set_info_labels(info_labels)
+		if isinstance(info_labels, (list, tuple,)):
+			# we have both - prefilled info_labels and callable to load more detailed info_labels - first element is prefilled info_labels, second element is callable to load more detailed info_labels
+			set_info_labels(info_labels[0])
+			item.load_info_cbk = lambda cbk_continue: load_info(info_labels[1], cbk_continue)
+		else:
+			# info_labels as dictionary - just call function to set it ...
+			set_info_labels(info_labels)
 
 
 def create_directory_it(name, params={}, image=None, infoLabels={}, menuItems={}, search_folder=False, search_item=False, video_item=False, dataItem=None, traktItem=None, download=True):
