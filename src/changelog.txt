@@ -1,3 +1,8 @@
+ArchivCZSK 3.6.4, 24.04.2026
+    - oprava zadávania textu v nastaveniach pomocou číselných klávesov
+    - rozšírenie API pre doplnky
+    - drobné opravy v rôznych častiach pluginu
+
 ArchivCZSK 3.6.3, 03.04.2026
     - oprava ovládania viacriadkového ChoiceBox
     - úprava API pre doplnky

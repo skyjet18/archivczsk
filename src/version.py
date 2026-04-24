@@ -1,5 +1,5 @@
 title = "ArchivCZSK"
-version = "3.6.3"
+version = "3.6.4"
 author = "archivczsk"
 description = "Playing CZ/SK archives"
 url = "https://github.com/archivczsk/archivczsk/"
