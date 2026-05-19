@@ -8,6 +8,7 @@ Updated on 28.10.2017 by chaoss
 import os
 import shutil
 import traceback
+import threading
 import json
 import requests
 import xml.etree.ElementTree as ET
@@ -306,9 +307,14 @@ class AddonsUpdater(RunNext):
 	def check_addon_updates(self, check_only=False):
 		from ..archivczsk import ArchivCZSK
 
+		lock = threading.Lock()
+		threads = []
 		def check_repository(repository):
 			try:
-				self.to_update_addons.extend(repository.check_updates())
+				to_update = repository.check_updates()
+				with lock:
+					self.to_update_addons.extend(to_update)
+
 			except UpdateXMLVersionError:
 				log.error('cannot retrieve update xml for repository %s', repository)
 			except UpdateXMLNoUpdateUrl:
@@ -317,7 +323,13 @@ class AddonsUpdater(RunNext):
 				log.error('error when checking updates for repository %s\n%s', (repository, traceback.format_exc()))
 
 		for repository in ArchivCZSK.get_repositories():
-			check_repository(repository)
+			if repository.enabled():
+				threads.append(threading.Thread(target=check_repository, args=(repository,)))
+
+		for t in threads:
+			t.start()
+		for t in threads:
+			t.join()
 
 		update_string = '\n'.join(addon.name for addon in self.to_update_addons)
 		if len(self.to_update_addons) > 5:
