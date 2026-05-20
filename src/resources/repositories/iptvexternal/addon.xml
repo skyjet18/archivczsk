@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="iptvexternal" name="External IPTV sources" provider-name="MikrotikExe" version="1.0">
+	<extension point="archivczsk.addon.repository">
+		<info>https://raw.githubusercontent.com/MikrotikExe/archivczsk-iptvexternal/main/addons.xml</info>
+		<datadir>https://raw.githubusercontent.com/MikrotikExe/archivczsk-iptvexternal/main/repo</datadir>
+	</extension>
+	<extension point="archivczsk.addon.metadata">
+		<description>Adds support for external IPTV sources (Tvheadend server, M3U playlist) by generating Enigma2 userbouquets and injecting EPG so channels appear natively in the Enigma2 channel list.</description>
+		<description lang="cs">Přidává podporu externích IPTV zdrojů (Tvheadend server, M3U playlist) generováním Enigma2 userbouquetů a injektováním EPG, takže kanály se zobrazí nativně v seznamu kanálů Enigma2.</description>
+		<description lang="sk">Pridáva podporu externých IPTV zdrojov (Tvheadend server, M3U playlist) generovaním Enigma2 userbouquetov a injektovaním EPG, takže kanály sa zobrazia natívne v zozname kanálov Enigma2.</description>
+	</extension>
+</addon>
