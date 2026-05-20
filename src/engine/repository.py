@@ -60,9 +60,6 @@ class Repository():
 		self._updater = updater.Updater(self)
 		self.init_settings()
 
-		if self.enabled():
-			self.load_addons()
-
 	def init_settings(self):
 		repository_id = self.id.replace('.', '_')
 
@@ -130,13 +127,17 @@ class Repository():
 					#log.error("%s cannot load video addon %s, skipping.." , self, addon_dir)
 					continue
 				else:
-					archivczsk.ArchivCZSK.add_addon(addon)
-					self.add_addon(addon)
+					if not archivczsk.ArchivCZSK.has_addon(addon.id):
+						archivczsk.ArchivCZSK.add_addon(addon)
+						self.add_addon(addon)
 
-					# create virtual addons based on configured profiles
-					for profile_id, profile_name in addon.get_profiles().items():
-						log.debug("[%s] Loaded virtual profile %s with id %s" % (addon.id, profile_name, profile_id))
-						self.add_virtual_addon(addon, profile_id, profile_name)
+						# create virtual addons based on configured profiles
+						for profile_id, profile_name in addon.get_profiles().items():
+							log.debug("[%s] Loaded virtual profile %s with id %s" % (addon.id, profile_name, profile_id))
+							self.add_virtual_addon(addon, profile_id, profile_name)
+					else:
+						log.error("[%s] Addon with ID %s already loaded, skipping ..." % (self, addon.id))
+						addon.close()
 
 
 			elif addon_info.type == 'tools':
@@ -148,8 +149,13 @@ class Repository():
 					log.error("[%s] cannot load tools addon %s, skipping ..." % (self, addon_dir))
 					continue
 				else:
-					archivczsk.ArchivCZSK.add_addon(tools)
-					self.add_addon(tools)
+					if not archivczsk.ArchivCZSK.has_addon(tools.id):
+						archivczsk.ArchivCZSK.add_addon(tools)
+						self.add_addon(tools)
+					else:
+						log.error("[%s] Addon with ID %s already loaded, skipping ..." % (self, tools.id))
+						tools.close()
+
 		log.debug("[%s] addons successfully loaded" % self)
 
 	def add_virtual_addon(self, addon, profile_id, profile_name):

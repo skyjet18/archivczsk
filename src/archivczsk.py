@@ -72,9 +72,22 @@ class ArchivCZSK():
 				except Exception:
 					log.error("Failed to load repository: %s\n%s" % (repo, traceback.format_exc()))
 				else:
-					ArchivCZSK.add_repository(repository)
-					if repository.path not in sys.path:
-						sys.path.append(repository.path)
+					if not ArchivCZSK.has_repository(repository):
+						ArchivCZSK.add_repository(repository)
+						if repository.path not in sys.path:
+							sys.path.append(repository.path)
+					else:
+						log.error("Repository with ID %s already loaded, skipping ..." % repository.id)
+
+	@staticmethod
+	def load_addons():
+		for repository in ArchivCZSK.get_repositories():
+			if repository.enabled():
+				try:
+					log.info("Loading addons from repository %s" % repository)
+					repository.load_addons()
+				except:
+					log.error("Failed to load addons from repository %s:\n%s" % (repository, traceback.format_exc()))
 
 	@staticmethod
 	def process_skin(skin_path_orig, skin_path_new):
@@ -229,7 +242,11 @@ class ArchivCZSK():
 
 	@staticmethod
 	def get_repositories():
-		return list(ArchivCZSK.__repositories.values())
+		return list(sorted(ArchivCZSK.__repositories.values(), key=lambda r: r.is_third_party()))
+
+	@staticmethod
+	def has_repository(repository):
+		return repository.id in ArchivCZSK.__repositories
 
 	@staticmethod
 	def add_repository(repository):
@@ -363,6 +380,7 @@ class ArchivCZSK():
 		ArchivCZSKHttpServer.start()
 		ArchivCZSK.load_skin()
 		ArchivCZSK.load_repositories()
+		ArchivCZSK.load_addons()
 		ArchivCZSK.init_addons()
 		log.debug("Starting stats collection")
 		UsageStats.start()
@@ -608,6 +626,7 @@ class ArchivCZSK():
 		ArchivCZSK.unload_modules(modules_to_reload)
 
 		ArchivCZSK.load_repositories()
+		ArchivCZSK.load_addons()
 		ArchivCZSK.init_addons()
 		ArchivCZSK.preload_addons()
 
