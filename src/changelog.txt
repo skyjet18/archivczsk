@@ -1,3 +1,11 @@
+ArchivCZSK 3.7.0, 20.05.2026
+    - vylepšená práca s viacerými repozitármi
+    - pridaný manažment repozitárov tretích strán v okne Manažér -> Modré tlačidlo
+    - pridaný repozitár tretej strany s IPTV doplnkami pre TVHeadend
+
+    !!! POZOR ZMENA !!!
+    - ak používate akýkoľvek iný repozitár okrem oficiálneho, tak ho musíte ručne povoliť cez manažér doplnkov
+
 ArchivCZSK 3.6.4, 24.04.2026
     - oprava zadávania textu v nastaveniach pomocou číselných klávesov
     - rozšírenie API pre doplnky
