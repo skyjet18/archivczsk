@@ -4,7 +4,8 @@ Created on 21.10.2012
 @author: marko
 '''
 import os, traceback
-from Components.config import config, ConfigSubsection, ConfigText
+from Components.config import config, ConfigSubsection, ConfigText, ConfigYesNo
+from hashlib import md5
 
 from .. import archivczsk
 from .addon import AddonInfo, ToolsAddon, VideoAddon, VirtualVideoAddon
@@ -36,6 +37,7 @@ class Repository():
 
 		self.update_datadir_url = repo_dict['repo_datadir_url']
 		self.update_authorization = repo_dict['repo_authorization']
+		self.hash = repo_dict['hash']
 
 		self.path = os.path.dirname(config_file)
 		self.addons_path = self.path#os.path.join(self.path, "addons")
@@ -56,6 +58,42 @@ class Repository():
 
 		#create updater for repository
 		self._updater = updater.Updater(self)
+		self.init_settings()
+
+		if self.enabled():
+			self.load_addons()
+
+	def init_settings(self):
+		repository_id = self.id.replace('.', '_')
+
+		setattr(config.plugins.archivCZSK.repositories, repository_id, ConfigSubsection())
+		self.settings = getattr(config.plugins.archivCZSK.repositories, repository_id)
+		self.settings.enabled = ConfigYesNo(default=True if self.is_signed() else False)
+
+	def is_signed(self):
+		# yes I know, that this has nothing to do with security, but I'm lazy to implement proper signing and verification using PKI
+		if self.hash == None:
+			return False
+
+		m = md5()
+		for x in ('archivczsk_', self.__class__.__name__.lower(), self.id, self.version, self.update_xml_url, self.update_datadir_url, self.update_authorization):
+			if x:
+				m.update(x.encode('utf-8'))
+
+		return self.hash == m.hexdigest()
+
+	def is_third_party(self):
+		return self.id != 'archivczsk_doplnky'
+
+	def enabled(self, new_value=None):
+		if new_value is not None:
+			self.settings.enabled.value = new_value
+			self.settings.enabled.save()
+
+		return self.settings.enabled.value
+
+	def load_addons(self):
+		log.debug("[%s] Loading addons" % self)
 
 		# load installed addons in repository
 		for addon_dir in os.listdir(self.addons_path):
@@ -66,12 +104,12 @@ class Repository():
 			try:
 				addon_info = AddonInfo(os.path.join(addon_path, self.addon_xml_relpath))
 			except Exception:
-				log.logError("Failed to get addon info from dir %s\n" % addon_dir )
+				log.logError("[%s] Failed to get addon info from dir %s\n" % (self, addon_dir) )
 				log.logError(traceback.format_exc())
 				continue
 
 			if addon_info.type not in Repository.SUPPORTED_ADDONS:
-				log.logError("Load not supported type of addon %s failed, skipping...\n" % (addon_dir,) )
+				log.logError("Load not supported type of addon %s failed, skipping...\n" % addon_dir )
 				continue
 			if addon_info.type == 'video':
 				try:
@@ -82,13 +120,13 @@ class Repository():
 							if os.path.isfile(tmp):
 								break
 						else:
-							raise Exception("Invalid addon %s. No script file '%s.py[oc]' found" % (addon_info.name, addon_info.import_name))
+							raise Exception("[%s] Invalid addon %s. No script file '%s.py[oc]' found" % (self, addon_info.name, addon_info.import_name))
 
 					addon = VideoAddon(addon_info, self)
 					addon.init_profile_settings()
 				except Exception:
 					traceback.print_exc()
-					log.logError("Load video addon %s failed, skipping...\n%s" % (addon_dir, traceback.format_exc()))
+					log.logError("[%s] Load video addon %s failed, skipping...\n%s" % (self, addon_dir, traceback.format_exc()))
 					#log.error("%s cannot load video addon %s, skipping.." , self, addon_dir)
 					continue
 				else:
@@ -107,12 +145,12 @@ class Repository():
 					tools = ToolsAddon(addon_info, self)
 				except Exception:
 					traceback.print_exc()
-					log.error("%s cannot load tools addon %s, skipping.." , self, addon_dir)
+					log.error("[%s] cannot load tools addon %s, skipping ..." % (self, addon_dir))
 					continue
 				else:
 					archivczsk.ArchivCZSK.add_addon(tools)
 					self.add_addon(tools)
-		log.debug("%s successfully loaded" , self)
+		log.debug("[%s] addons successfully loaded" % self)
 
 	def add_virtual_addon(self, addon, profile_id, profile_name):
 		addon = VirtualVideoAddon(addon.info, self, profile_id, profile_name)
@@ -142,3 +180,13 @@ class Repository():
 
 	def check_updates(self):
 		return self._updater.check_addons()
+
+	def get_description(self, lang_id):
+		if lang_id in self.description:
+			return self.description[lang_id]
+		elif lang_id == 'sk' and 'cs' in self.description:
+			return self.description['cs']
+		elif lang_id == 'cs' and 'sk' in self.description:
+			return self.description['sk']
+		else:
+			return self.description.get('en', u'')

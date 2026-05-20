@@ -24,12 +24,13 @@ from ..engine.tools.util import toString
 from ..engine.tools.logger import log
 from ..engine.parental import parental_pin
 from .base import BaseArchivCZSKListSourceScreen
-from .common import LoadingScreen, TipBar, CutLabel
+from .common import LoadingScreen, TipBar, CutLabel, showInfoMessage, showYesNoDialog
 from .download import DownloadList
 from enigma import gPixmapPtr
 from .menu import ArchivCZSKConfigScreen
 from ..colors import DeleteColors
 from . import info
+from .config import ArchivCZSKSimpleConfigScreen, SimpleConfigYesNo
 
 KEY_MENU_IMG = LoadPixmap(cached=True, path=os.path.join(settings.IMAGE_PATH, 'key_menu.png'))
 KEY_INFO_IMG = LoadPixmap(cached=True, path=os.path.join(settings.IMAGE_PATH, 'key_info.png'))
@@ -236,7 +237,7 @@ class ArchivCZSKVideoAddonsManagementScreen(BaseContentScreen, TipBar):
 		self["key_red"] = Label("")
 		self["key_green"] = Label(_("Restore ordering"))
 		self["key_yellow"] = Label("")
-		self["key_blue"] = Label("")
+		self["key_blue"] = Label(_("Repositories"))
 		self["actions"] = ActionMap(["archivCZSKActions"],
 			 {
 					"ok": self.ok,
@@ -250,6 +251,7 @@ class ArchivCZSKVideoAddonsManagementScreen(BaseContentScreen, TipBar):
 					"menu" : self.menu,
 					"red": lambda: self.set_reorder_mode(not self.reorder_mode),
 					"green": self.restore_default_order,
+					"blue": self.open_repositories_management
 			 }, -2)
 		self.onLayoutFinish.append(self.updateAddonGUI)
 		self.reorder_mode = False
@@ -413,6 +415,49 @@ class ArchivCZSKVideoAddonsManagementScreen(BaseContentScreen, TipBar):
 			self.updateMenuList(index=new_idx)
 
 	reorder_mode = property(lambda self: self._reorder_mode, set_reorder_mode)
+
+	def open_repositories_management(self):
+		from ..archivczsk import ArchivCZSK
+		from ..engine.tools.lang import get_language_id
+
+		cfg_list = []
+		repositories = []
+		for repository in ArchivCZSK.get_repositories():
+			if repository.is_third_party():
+				cfg_list.append(SimpleConfigYesNo(toString(repository.name), default=repository.enabled(), tooltip=toString(repository.get_description(get_language_id()))))
+				repositories.append(repository)
+
+		def warning_msg_callback(result):
+			if result == False:
+				return
+
+			reload_needed = False
+			for i, c in enumerate(cfg_list):
+				if c.get_value() != repositories[i].enabled():
+					repositories[i].enabled(c.get_value())
+					reload_needed = True
+
+			if reload_needed:
+				if config.plugins.archivCZSK.no_restart:
+					ArchivCZSK.reload_needed(True)
+				else:
+					ArchivCZSK.__need_restart = True
+
+				showInfoMessage(self.session, _("List of enabled repositories was updated. Changes will be applied after new ArchivCZSK start."), timeout=10)
+
+
+		def simple_config_callback(result):
+			if result == False:
+				return
+
+			if any(c.get_value() and repositories[i].is_third_party() and not repositories[i].enabled() for i, c in enumerate(cfg_list)):
+				showYesNoDialog(self.session, _("Enabling third-party repositories may cause security risks. The authors of ArchivCZSK bear no responsibility for addons distributed through these repositories. You do so at your own risk. Do you want to continue?"), warning_msg_callback, default=False)
+			else:
+				warning_msg_callback(True)
+
+
+		self.session.openWithCallback(simple_config_callback, ArchivCZSKSimpleConfigScreen, config_entries=cfg_list, title=_("Third-party repositories"))
+
 
 class ArchivCZSKContentScreen(BaseContentScreen, DownloadList, TipBar):
 

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="archivczsk_doplnky" name="ArchivCZSK doplnky" provider-name="archivczsk" version="2.0.0">
-	<extension point="archivczsk.addon.repository" name="ArchivCZSK addons repository">
+<addon id="archivczsk_doplnky" name="Official ArchivCZSK addons" provider-name="archivczsk" version="2.0.0" rhash="48b92a825b2f65604ed942c7593b084d">
+	<extension point="archivczsk.addon.repository">
 		<info>https://raw.githubusercontent.com/{update_repository}/archivczsk-doplnky/{update_branch}/addons.xml</info>
 		<datadir>https://raw.githubusercontent.com/{update_repository}/archivczsk-doplnky/{update_branch}/repo</datadir>
 	</extension>
 	<extension point="archivczsk.addon.metadata">
-		<description>This repository contains mostly video addons for czech and slovak users. Please send feedback, patches or fire any issues on https://github.com/archivczsk/archivczsk-doplnky</description>
-		<description lang="cs">Tento repozitář obsahuje video doplňky pro česky a slovensky mluvící uživatele. Máte-li jakékoliv poznámky, náměty, doplňky k začlenění nebo chcete nahlásit chybu, navštivte https://github.com/archivczsk/archivczsk-doplnky</description>
+		<description>This repository contains mostly video addons for czech and slovak users.</description>
+		<description lang="cs">Tento repozitář obsahuje video doplňky převažně pro česky a slovensky mluvící uživatele.</description>
+		<description lang="sk">Tento repozitár obsahuje video doplnky prevažne pre česky a slovensky hovoriacich používateľov.</description>
 	</extension>
 </addon>
