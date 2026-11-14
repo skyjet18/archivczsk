@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: enigma2-plugin-extension-archivczsk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 08:33+0100\n"
-"PO-Revision-Date: 2026-11-10 08:33+0100\n"
+"POT-Creation-Date: 2026-11-14 18:40+0100\n"
+"PO-Revision-Date: 2026-11-14 18:41+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sk\n"
@@ -230,13 +230,13 @@ msgstr "Časový limit pre pripojenie na server vypršal"
 msgid "Waiting for data from server timed out"
 msgstr "Časový limit pri čakaní na dáta zo servera vypršal"
 
-#: src/gui/exception.py:137 src/gui/exception.py:145 src/gui/exception.py:149
-msgid "Connection to server failed"
-msgstr "Pripojenie na server zlyhalo"
-
-#: src/gui/exception.py:141
+#: src/gui/exception.py:137
 msgid "Unable to establish SSL connection to server"
 msgstr "Nepodarilo sa vytvoriť SSL spojenie na server"
+
+#: src/gui/exception.py:141 src/gui/exception.py:145 src/gui/exception.py:149
+msgid "Connection to server failed"
+msgstr "Pripojenie na server zlyhalo"
 
 #: src/gui/exception.py:153
 msgid "Timeout was exceeded"
@@ -486,7 +486,7 @@ msgid "Play"
 msgstr "Prehrať"
 
 #: src/gui/download.py:288 src/gui/download.py:401
-#: src/engine/handlers/category.py:44 src/engine/handlers/addon.py:315
+#: src/engine/handlers/category.py:45 src/engine/handlers/addon.py:315
 msgid "Remove"
 msgstr "Zmazať"
 
@@ -499,7 +499,7 @@ msgid "Do you want to cancel"
 msgstr "Chcete prerušiť"
 
 #: src/gui/download.py:338 src/gui/download.py:431
-#: src/engine/handlers/category.py:61 src/engine/handlers/addon.py:353
+#: src/engine/handlers/category.py:62 src/engine/handlers/addon.py:353
 msgid "Do you want to remove"
 msgstr "Chcete zmazať"
 
@@ -1094,19 +1094,19 @@ msgstr "Spustiť HTTP server iba pre interné použitie doplnkami"
 msgid "Allow sending anonymous usage statistics"
 msgstr "Povoliť posielanie anonymných štatistík používania pluginu"
 
-#: src/archivczsk.py:511
+#: src/archivczsk.py:512
 msgid "You need to restart E2. Do you want to restart it now?"
 msgstr "Zmeny sa prejavia po reštarte E2. Chcete reštartovať E2 teraz?"
 
-#: src/archivczsk.py:536
+#: src/archivczsk.py:532
 msgid "There is less than 500 kB of free space on system disk. Please free up some space in order or you will encounter issues with plugin operation."
 msgstr "Na systémovom disku je menej ako 500 kB voľného miesta. Uvoľnite prosím nejaké miesto, inak môžu nastať problémy s fungovaním doplnku."
 
-#: src/archivczsk.py:545
+#: src/archivczsk.py:541
 msgid "By system check there was no system plugin with name ServiceApp detected. This means, that your system only supports video player integrated in enigma2. Some addons doesn't work properly with internal player or don't work at all. If you will have problem with playing some videos, try to install ServiceApp system plugin from feed of your distribution. Then you can change in addon settings used video player to exteplayer3 that can handle many video formats better."
 msgstr "Pri kontrole systému nebol zistený žiadny systémový doplnok s názvom ServiceApp. To znamená, že váš systém podporuje iba videoprehrávač integrovaný v Enigma2. Niektoré doplnky nefungujú správne s interným prehrávačom alebo nefungujú vôbec. Ak budete mať problémy s prehrávaním niektorých videí, skúste nainštalovať systémový doplnok ServiceApp z repozitára vašej distribúcie. Potom môžete v nastaveniach doplnku zmeniť používaný videoprehrávač na exteplayer3, ktorý mnoho formátov videa zvládne lepšie."
 
-#: src/archivczsk.py:553
+#: src/archivczsk.py:549
 msgid "You are using outdated image in your receiver without updated SSL certificates used for HTTPS communication. This can cause problems connecting to some sites or services. Outdated images are not supported and errors related to SSL communication will not be fixed. Update your image to latest version or switch to other image if current one doesn't get updates anymore."
 msgstr "Vo svojom prijímači používate zastarané image bez aktualizovaných SSL certifikátov používaných pre HTTPS komunikáciu. Môže to spôsobiť problémy s pripojením k niektorým stránkam alebo službám. Zastarané image nie sú podporované a chyby súvisiace s SSL komunikáciou nebudú opravené. Aktualizujte svoje image na najnovšiu verziu alebo prejdite na iné, ak už vaše aktuálne nedostáva ďalšie aktualizácie."
 
@@ -1261,7 +1261,7 @@ msgstr "Toto je bonusová funkcia dostupná len pre podporovateľov produktu."
 msgid "Do you want to know, how to get \"Supporter\" status?"
 msgstr "Chcete vedieť ako získať status \\\"Podporovateľ\\\"?"
 
-#: src/engine/addon.py:598 src/resources/repositories/config.py:26
+#: src/engine/addon.py:615 src/resources/repositories/config.py:26
 msgid "General"
 msgstr "Všeobecné"
 
@@ -1341,29 +1341,29 @@ msgstr "Všetky doplnky"
 msgid "Category list"
 msgstr "Zoznam kategórií"
 
-#: src/engine/contentprovider.py:606
+#: src/engine/contentprovider.py:610
 msgid "Loading of addon failed"
 msgstr "Načítavanie doplnku zlyhalo"
 
-#: src/engine/contentprovider.py:612
+#: src/engine/contentprovider.py:616
 msgid "Addon returned not supported communication interface"
 msgstr "Doplnok vrátil nepodporované komunikačné rozhranie"
 
-#: src/engine/contentprovider.py:647
+#: src/engine/contentprovider.py:651
 msgid "Addon is designed for ArchivCZSK version lower then 2.5.0 and incompatible with installed version. Update ArchivCZSK and addons to latest available versions."
 msgstr "Doplnok je vytvorený pre ArchivCZSK verziu menšiu ako 2.5.0 a nie je kompatibilný s nainštalovanou verziou. Zaktualizujte ArchivCZSK a doplnky na posledné dostupné verzie."
 
-#: src/engine/contentprovider.py:652
+#: src/engine/contentprovider.py:656
 #, python-brace-format
 msgid "You need to update ArchivCZSK at least to version {version}"
 msgstr "Musíte aktualizovať ArchivCZSK aspoň na verziu {version}"
 
-#: src/engine/contentprovider.py:664
+#: src/engine/contentprovider.py:668
 #, python-brace-format
 msgid "Cannot execute addon {addon_name}. Dependency {dependency_name} version {dependency_version} needs to be at least version {dependency_version_requiered}"
 msgstr "Spustenie doplnku {addon_name} zlyhalo. Nainštalovaná závislosť {dependency_name} verzia {dependency_version} musí byť aspoň vo verzii {dependency_version_requiered}"
 
-#: src/engine/contentprovider.py:672
+#: src/engine/contentprovider.py:676
 #, python-brace-format
 msgid ""
 "Cannot execute addon {addon_name}. Missing dependency: {dependency_name}\n"
@@ -1372,15 +1372,15 @@ msgstr ""
 "Spustenie doplnku {addon_name} zlyhalo. Chýba závislosť: {dependency_name}\n"
 "Skontrolujte voľné miesto v prijímači, preinštalujte ArchivCZSK a vykonajte aktualizáciu všetkých doplnkov pre vyriešenie problému."
 
-#: src/engine/handlers/category.py:41
+#: src/engine/handlers/category.py:42
 msgid "Rename"
 msgstr "Premenovať"
 
-#: src/engine/handlers/category.py:50
+#: src/engine/handlers/category.py:51
 msgid "Set new category name:"
 msgstr "Zvoľte nové meno kategórie:"
 
-#: src/engine/handlers/category.py:61
+#: src/engine/handlers/category.py:62
 msgid "category"
 msgstr "kategóriu"
 
@@ -1582,50 +1582,78 @@ msgstr ""
 "Aktualizácia ArchivCZSK zlyhala. {cmd} skončilo chybou\n"
 "{msg}"
 
-#: src/engine/updater.py:306
+#: src/engine/updater.py:307
 msgid "Checking for addons update"
 msgstr "Kontrolujem aktualizácie doplnkov"
 
-#: src/engine/updater.py:342
+#: src/engine/updater.py:343
 msgid "Some addons need update"
 msgstr "Niektoré doplnky potrebujú aktualizáciu"
 
-#: src/engine/updater.py:342
+#: src/engine/updater.py:343
 msgid "All addons are up to date"
 msgstr "Všetky doplnky sú aktuálne"
 
-#: src/engine/updater.py:356
+#: src/engine/updater.py:357
 msgid "Do you want to update"
 msgstr "Chcete aktualizovať"
 
-#: src/engine/updater.py:356
+#: src/engine/updater.py:357
 msgid "addons"
 msgstr "doplnky"
 
-#: src/engine/updater.py:370
+#: src/engine/updater.py:372
 #, python-brace-format
 msgid "Updating addon: {name}"
 msgstr "Aktualizujem doplnok: {name}"
 
-#: src/engine/updater.py:378
+#: src/engine/updater.py:374
 msgid "Removing old broken and unsupported addons"
 msgstr "Odstraňujem staré, nefunkčné a nepodporované doplnky"
 
-#: src/engine/updater.py:401
+#: src/engine/updater.py:396
 msgid "Addons update finished"
 msgstr "Aktualizácia doplnkov dokončená"
 
-#: src/engine/updater.py:409
+#: src/engine/updater.py:408
 msgid "Following addons were updated"
 msgstr "Nasledujúce doplnky boli aktualizované"
 
-#: src/engine/updater.py:414
+#: src/engine/updater.py:415
+msgid "Following addons failed to update"
+msgstr "Nasledujúce doplnky sa nepodarilo aktualizovať"
+
+#: src/engine/updater.py:426
 msgid "Reloading addons. Please wait ..."
 msgstr "Znovu načítavam doplnky. Prosím čakajte ..."
 
-#: src/engine/updater.py:424
+#: src/engine/updater.py:436
 msgid "Addons were reloaded"
 msgstr "Doplnky boli znovu načítané"
+
+#: src/engine/updater.py:495
+msgid "Download failed"
+msgstr "Sťahovanie zlyhalo"
+
+#: src/engine/updater.py:498
+msgid "Downloaded file does not exist"
+msgstr "Stiahnutý súbor neexistuje"
+
+#: src/engine/updater.py:504
+msgid "Failed to get size of installed version"
+msgstr "Nepodarilo sa zistiť veľkosť nainštalovanej verzie"
+
+#: src/engine/updater.py:510
+msgid "Failed to get size of new version"
+msgstr "Nepodarilo sa zistiť veľkosť novej verzie"
+
+#: src/engine/updater.py:514
+msgid "Not enough space for update"
+msgstr "Nie je dostatok miesta na aktualizáciu"
+
+#: src/engine/updater.py:533
+msgid "Cannot unzip downloaded file"
+msgstr "Stiahnutý súbor sa nedá rozbaliť"
 
 #: src/engine/trakttv.py:99
 #, python-brace-format

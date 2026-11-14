@@ -14,8 +14,8 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from .tools import util, parser
-from .tools.unzip import unzip_to_dir
-from .tools.util import toString, have_enough_space
+from .tools.unzip import unzip_to_dir, get_unzipped_size
+from .tools.util import toString, have_enough_space, get_dir_size
 from .tools.stbinfo import stbinfo
 from ..compat import eCompatTimer
 from .exceptions.updater import UpdateXMLVersionError, UpdateXMLNoUpdateUrl
@@ -299,6 +299,7 @@ class AddonsUpdater(RunNext):
 		self.session = update_dialog.session if update_dialog else FakeSession()
 		self.finish_cbk = finish_cbk
 		self.updated_addons = []
+		self.failed_addons = []
 		self.to_update_addons = []
 
 	def checkUpdate(self):
@@ -361,6 +362,7 @@ class AddonsUpdater(RunNext):
 			return self.continueToArchiv()
 
 		self.updated_addons = []
+		self.failed_addons = []
 		self.to_update_addons_len = len(self.to_update_addons)
 		return self.run_addons_update()
 
@@ -369,24 +371,17 @@ class AddonsUpdater(RunNext):
 			self.__addon = self.to_update_addons.pop()
 			self.run_next(self.process_addon_update, _('Updating addon: {name}').format(name=self.__addon.name))
 		else:
-			update_string = '\n'.join(addon_u.name for addon_u in self.updated_addons)
-			if len(self.updated_addons) > 5:
-				update_string = '\n'.join(addon.name for addon in self.updated_addons[:6])
-				update_string += "\n...\n..."
-
-			self.__update_string = update_string
 			self.run_next(self.cleanup_addons, _("Removing old broken and unsupported addons"))
 
 	def process_addon_update(self):
-		updated = False
 		addon = self.__addon
 		try:
-			updated = addon.update()
-		except Exception:
+			addon.update()
+		except Exception as e:
 			log.logError("Update addon '%s' failed.\n%s" % (addon.id,traceback.format_exc()))
+			self.failed_addons.append( (addon, str(e),) )
 		else:
-			if updated:
-				self.updated_addons.append(addon)
+			self.updated_addons.append(addon)
 
 		self.run_addons_update()
 
@@ -401,15 +396,32 @@ class AddonsUpdater(RunNext):
 		self.run_next(self.update_finished, _("Addons update finished"))
 
 	def update_finished(self):
-		updated_string = self.__update_string
-		del self.__update_string
+		if not self.failed_addons:
+			if len(self.updated_addons) > 5:
+				update_string = '\n'.join(addon.name for addon in self.updated_addons[:6])
+				update_string += "\n...\n..."
+			else:
+				update_string = '\n'.join(addon.name for addon in self.updated_addons)
 
-		self.session.openWithCallback(self.update_finished2,
-				MessageBox,
-				"%s: (%s/%s):\n\n%s" % (_("Following addons were updated"), len(self.updated_addons), self.to_update_addons_len, toString(updated_string)),
-				type=MessageBox.TYPE_INFO)
+			self.session.openWithCallback(self.update_finished2,
+					MessageBox,
+					"%s: (%s/%s):\n\n%s" % (_("Following addons were updated"), len(self.updated_addons), self.to_update_addons_len, toString(update_string)),
+					type=MessageBox.TYPE_INFO)
+		else:
+			update_string = '\n'.join('{}: {}'.format(addon.name, err_msg) for addon, err_msg in self.failed_addons)
+
+			self.session.openWithCallback(self.update_finished2,
+					MessageBox,
+					"%s: (%s/%s):\n\n%s" % (_("Following addons failed to update"), len(self.failed_addons), self.to_update_addons_len, toString(update_string)),
+					type=MessageBox.TYPE_ERROR)
 
 	def update_finished2(self, *args):
+		if not self.updated_addons:
+			return self.continueToArchiv()
+
+		self.updated_addons = []
+		self.failed_addons = []
+
 		if config.plugins.archivCZSK.no_restart.value:
 			self.run_next(self.reload_addons, _("Reloading addons. Please wait ..."))
 		else:
@@ -479,36 +491,56 @@ class Updater(object):
 		local_base_id = os.path.join(self.local_path, addon.id)
 		zip_file = self._download(addon)
 
-		if zip_file is not None and os.path.isfile(zip_file):
-			# remove directory based on dir where addon is installed
+		if not zip_file:
+			raise Exception(_("Download failed"))
+
+		if not os.path.isfile(zip_file):
+			raise Exception(_("Downloaded file does not exist"))
+
+		try:
+			prev_ver_size = get_dir_size(local_base)
+		except Exception as e:
+			log.logError("[%s] failed to get size of installed version: %s\n%s" % (addon.name, str(e), traceback.format_exc()))
+			raise Exception(_("Failed to get size of installed version"))
+
+		try:
+			new_ver_size = get_unzipped_size(zip_file)
+		except Exception as e:
+			log.logError("[%s] failed to get size of new version: %s\n%s" % (addon.name, str(e), traceback.format_exc()))
+			raise Exception(_("Failed to get size of new version"))
+
+		if not have_enough_space(self.local_path, new_ver_size - prev_ver_size + (300 * 1024) ):
+			log.logError("[%s] not enough space for update" % addon.name)
+			raise Exception(_("Not enough space for update"))
+
+		# remove directory based on dir where addon is installed
+		if os.path.isdir(local_base):
+			shutil.rmtree(local_base)
+
+		# remove directory based od addon id
+		if os.path.isdir(local_base_id):
+			shutil.rmtree(local_base_id)
+
+		try:
+			# unzip downloaded file without checking for free space, because we have already checked it above
+			unzip_to_dir(zip_file, self.local_path, False)
+		except Exception as e:
+			log.logError("[%s] update failed - cannot unzip downloaded file: %s\n%s" % (addon.name, str(e), traceback.format_exc()))
+
 			if os.path.isdir(local_base):
 				shutil.rmtree(local_base)
 
-			# remove directory based od addon id
-			if os.path.isdir(local_base_id):
-				shutil.rmtree(local_base_id)
+			raise Exception(_("Cannot unzip downloaded file"))
 
-			try:
-				unzip_to_dir(zip_file, self.local_path)
-			except Exception as e:
-				log.logError("[%s] update failed - cannot unzip downloaded file: %s\n%s" % (addon.name, str(e), traceback.format_exc()))
+		# store addon's previous version - used to show changelog on first run
+		if os.path.isdir(local_base):
+			# this check is needed, because if we install new addon (not already installed) we only guess addon.relative_path
+			with open(os.path.join(local_base, '.update_ver'), 'w') as f:
+				f.write(addon.version)
 
-				if os.path.isdir(local_base):
-					shutil.rmtree(local_base)
+		log.debug("[%s] successfully updated to version %s" % (addon.name, self.remote_addons_dict[addon.id]['version']))
+		os.remove(zip_file)
 
-				return False
-
-			# store addon's previous version - used to show changelog on first run
-			if os.path.isdir(local_base):
-				# this check is needed, because if we install new addon (not already installed) we only guess addon.relative_path
-				with open(os.path.join(local_base, '.update_ver'), 'w') as f:
-					f.write(addon.version)
-
-			log.debug("[%s] successfully updated to version %s" % (addon.name, self.remote_addons_dict[addon.id]['version']))
-			os.remove(zip_file)
-			return True
-		log.debug("[%s] failed to update to version %s" % (addon.name, addon.version))
-		return False
 
 	def remove_addon(self, addon):
 		"""removes addon"""

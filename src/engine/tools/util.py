@@ -630,6 +630,15 @@ def have_enough_space(location, required_space=500 * 1024):
 	else:
 		return False
 
+def get_dir_size(location):
+	total_size = 0
+	for dirpath, dirnames, filenames in os.walk(location):
+		for f in filenames:
+			fp = os.path.join(dirpath, f)
+			if os.path.isfile(fp):
+				total_size += os.path.getsize(fp)
+	return total_size
+
 def check_program(program):
 
 	def is_file(fpath):

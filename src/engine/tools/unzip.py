@@ -23,16 +23,21 @@ def _get_destination_path(dest_dir, filename):
 		raise ValueError("ZIP entry path escapes destination directory: %s" % filename)
 	return dst_file
 
+def get_unzipped_size( zip_file ):
+	with ZipFile( zip_file, 'r' ) as z:
+		return sum(l.file_size for l in z.infolist())
 
-def unzip_to_dir( zip_file, dest_dir ):
+
+def unzip_to_dir( zip_file, dest_dir, check_space=True ):
 	dest_dir = os.path.realpath(dest_dir)
 	with ZipFile( zip_file, 'r' ) as z:
-		# check if there is enough space on the disk to extract the files
-		total_size = sum(l.file_size for l in z.infolist())
-		if total_size > 0:
-			available_space = get_free_space(dest_dir) or 0
-			if total_size > (available_space - 300 * 1024):  # always leave 300 kB of free space for safety
-				raise ValueError("Not enough space on disk to extract ZIP file: required %d kB, available %d kB" % (total_size // 1024, available_space // 1024))
+		if check_space:
+			# check if there is enough space on the disk to extract the files
+			total_size = sum(l.file_size for l in z.infolist())
+			if total_size > 0:
+				available_space = get_free_space(dest_dir) or 0
+				if total_size > (available_space - 300 * 1024):  # always leave 300 kB of free space for safety
+					raise ValueError("Not enough space on disk to extract ZIP file: required %d kB, available %d kB" % (total_size // 1024, available_space // 1024))
 
 		for l in z.infolist():
 			dst_file = _get_destination_path(dest_dir, l.filename)
