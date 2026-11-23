@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="cztor" name="CZtor video" provider-name="CZtor" version="1.0">
+	<extension point="archivczsk.addon.repository">
+		<info>https://cztor.com/enigma2/archiv/addons.xml</info>
+		<datadir>https://cztor.com/enigma2/archiv</datadir>
+	</extension>
+	<extension point="archivczsk.addon.metadata">
+		<description>Movies and series from CZtor.com (account at cztor.com).</description>
+		<description lang="cs">Filmy a seriály z CZtor.com (účet na cztor.com).</description>
+		<description lang="sk">Filmy a seriály z CZtor.com (účet na cztor.com).</description>
+	</extension>
+</addon>
