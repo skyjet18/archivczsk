@@ -1,3 +1,7 @@
+ArchivCZSK 3.9.5, 23.11.2026
+    - pre sťahovanie sa predvolene vždy použije ffmpeg z ArchivCZSK
+    - pridaný repozitár pre službu CZtor - kto má záujem, tak si ho môže aktivovať pomocou Manažéra doplnkov
+
 ArchivCZSK 3.9.4, 15.11.2026
     - kontrola voľného miesta pred inštaláciou aktualizácie doplnku
     - vylepšenie hlásenia chýb, ak aktualizácia doplnku z nejakého dôvodu zlyhá
