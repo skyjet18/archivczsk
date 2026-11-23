@@ -2,6 +2,7 @@ import os, traceback
 import shutil
 import random
 import time
+import subprocess
 from datetime import datetime
 from base64 import b64encode
 from hashlib import md5
@@ -10,6 +11,7 @@ from functools import partial
 
 from ..engine.tools import util
 from ..engine.tools.logger import log
+from ..engine.downloader import get_ffmpeg_path
 from ..compat import eCompatPicLoad, eCompatTimer
 from ..settings import USER_AGENT, PLUGIN_PATH
 
@@ -224,12 +226,19 @@ class PosterProcessing(object):
 				return True
 
 		# fallback - local slow conversion using ffmpeg
-		webp_dest = dest + '.webp'
-		with open(webp_dest, 'wb') as f:
-			f.write(original_data)
+		ffmpeg_path = get_ffmpeg_path()
 
-		os.system('ffmpeg -i "{}" -frames:v 1 {}'.format(webp_dest, dest))
-		os.remove(webp_dest)
+		if ffmpeg_path:
+			webp_dest = dest + '.webp'
+			with open(webp_dest, 'wb') as f:
+				f.write(original_data)
+
+			try:
+				subprocess.check_call([ffmpeg_path, '-i', webp_dest, '-frames:v', '1', dest])
+			except:
+				pass
+
+			os.remove(webp_dest)
 
 		return os.path.isfile(dest)
 

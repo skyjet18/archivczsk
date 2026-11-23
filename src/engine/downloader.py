@@ -25,7 +25,10 @@ elif videoPlayerInfo.type =='gstreamer' and videoPlayerInfo.version == '0.10':
 	GST_LAUNCH = 'gst-launch-0.10'
 
 def get_ffmpeg_path():
-	for p in ['/usr/lib/exteplayer3_deps/ffmpeg', '/usr/bin/ffmpeg']:
+	for p in [
+		'/usr/lib/enigma2/python/Plugins/Extensions/archivCZSK/resources/repositories/addons/tools_player_armv7l/bin/ffmpeg',
+		'/usr/lib/enigma2/python/Plugins/Extensions/archivCZSK/resources/repositories/addons/tools_player_mips/bin/ffmpeg',
+		'/usr/bin/ffmpeg']:
 		if os.path.isfile(p):
 			return p
 	return None
